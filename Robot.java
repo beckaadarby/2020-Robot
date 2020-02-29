@@ -3,17 +3,17 @@
  *
  * Copyright (C) Cross The Road Electronics.  All rights
  * reserved.
- * 
- * Cross The Road Electronics (CTRE) licenses to you the right to 
- * use, publish, and distribute copies of CRF (Cross The Road) firmware files (*.crf) and 
+ *
+ * Cross The Road Electronics (CTRE) licenses to you the right to
+ * use, publish, and distribute copies of CRF (Cross The Road) firmware files (*.crf) and
  * Phoenix Software API Libraries ONLY when in use with CTR Electronics hardware products
  * as well as the FRC roboRIO when in use in FRC Competition.
- * 
+ *
  * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
  * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT
  * LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS FOR A
  * PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL
- * CROSS THE ROAD ELECTRONICS BE LIABLE FOR ANY INCIDENTAL, SPECIAL, 
+ * CROSS THE ROAD ELECTRONICS BE LIABLE FOR ANY INCIDENTAL, SPECIAL,
  * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF
  * PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR SERVICES, ANY CLAIMS
  * BY THIRD PARTIES (INCLUDING BUT NOT LIMITED TO ANY DEFENSE
@@ -67,93 +67,26 @@ public class Robot extends TimedRobot {
     //intakes, conveyers, and shoots
     Joystick joystickExtras = new Joystick(1);
 
-    DifferentialDrive _diffDrive = new DifferentialDrive(_leftFront, _rghtFront);
-
+    Drive driveGuy = new Drive(_rghtFront,_rghtFollower, _leftFront, _leftFollower, _joystick);
+    Intake intakeMan = new Intake(intake, joystickExtras);
+    Conveyer conveyerDude = new Conveyer(conveyer, joystickExtras);
+    Shooter shooterGal = new Shooter(shootL, shootR, _joystick);
+    Winch mrWinch = new Winch(winchL, winchR, joystickExtras);
 
     @Override
     public void teleopPeriodic() {
 
-        /* get gamepad stick values */
-        double forw = -1 * _joystick.getRawAxis(1); /* positive is forward */
-        double turn = +1 * _joystick.getRawAxis(2); /* positive is right */
-        final boolean intakeIn = joystickExtras.getRawButton(9); /* is button is down, print joystick values */
-        final boolean intakeOut = joystickExtras.getRawButton(10);
-        final boolean conveyerIn = joystickExtras.getRawButton(11);
-        final boolean conveyerOut = joystickExtras.getRawButton(12);
-        final boolean halfSpeedBtn = joystickExtras.getRawButton(2);
-        double up = -1 * joystickExtras.getRawAxis(1); //moving the winches up and down by push
-        final boolean endgame = joystickExtras.getRawButton(1);
-        final boolean shoot = _joystick.getRawButton(1);
+        driveGuy.teleopPeriodic();
+        intakeMan.teleopPeriodic();
+        conveyerDude.teleopPeriodic();
+        shooterGal.teleopPeriodic();
+        mrWinch.teleopPeriodic();
 
-        /* deadband gamepad 10% */
-        if (Math.abs(forw) < 0.10) {
-            forw = 0;
-        }
-        if (Math.abs(turn) < 0.10) {
-            turn = 0;
-        }
-        if (Math.abs(up) < 0.10) {
-            up = 0;
-        }
 
-        /* drive robot */
-        _diffDrive.arcadeDrive(forw, turn);
-        
         /*
          * [2] Make sure Gamepad Forward is positive for FORWARD, and GZ is positive for
          * RIGHT
          */
-        
-
-
-        //moving the intake motor
-        if (intakeIn) {
-            intake.set(-1.0);
-        }else{
-            intake.set(0.0);
-        }
-
-        if (intakeOut) {
-            intake.set(1.0);
-        }else{
-            intake.set(0.0);
-        }
-
-        //moving the conveyer motor
-        if (conveyerIn) {
-            if (halfSpeedBtn){
-                conveyer.set(0.5);
-            }else{
-                conveyer.set(-1.0);
-            }
-        }else{
-            conveyer.set(0.0);
-        }        
-        if (conveyerOut) {
-            if (halfSpeedBtn){
-                conveyer.set(0.5);
-            }else{
-                conveyer.set(1.0);
-            }
-        }else{
-            conveyer.set(0.0);
-        }
-
-        //shooting a ball
-        if (shoot){
-            shootL.set(1.0);
-            shootR.set(-1.0);
-            conveyer.set(1.0);
-        }
-
-//start to climb at endgame
-        if (endgame) {
-            winchL.set(up);
-            winchR.set(up);
-        }else{
-            winchL.set(0.0);
-            winchR.set(0.0);
-        }
 
     }
 
